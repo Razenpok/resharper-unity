@@ -1,13 +1,14 @@
 ﻿<Project>
   <PropertyGroup>
-    <ILRepackOutputAssembly>$(OutputPath)$(AssemblyName).Repacked.dll</ILRepackOutputAssembly>
+    <ILRepackOutputAssembly>$(OutputPath)/$(TargetFramework)/$(AssemblyName).Repacked.dll</ILRepackOutputAssembly>
+    <ILRepackExecutable>~/.nuget/packages/jetbrains.build.ilrepack/0.0.1/tools/netcore/ILRepack.dll</ILRepackExecutable>
+    <LibDirectory>$(OutputPath)/$(TargetFramework)</LibDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(OS)' == 'Windows_NT'">
+    <ILRepackExecutable>&quot;$(UserProfile)/.nuget/packages/jetbrains.build.ilrepack/0.0.1/tools/netcore/ILRepack.dll&quot;</ILRepackExecutable>
   </PropertyGroup>
   <Target Name="RiderILRepack" AfterTargets="Build" Inputs="@(ILRepackInputAssemblies)" Outputs="$(ILRepackOutputAssembly)">
-    <ItemGroup>
-      <SearchDirectories Include="$(OutputPath)" />
-    </ItemGroup>
-    <ILRepack Parallel="true" Internalize="true" DebugInfo="true" InputAssemblies="@(ILRepackInputAssemblies)" 
-              LibraryPath="@(SearchDirectories)"
-              OutputFile="$(ILRepackOutputAssembly)" />
+<!--    <Error Condition="!Exists($(ILRepackExecutable))" Text="ILRepack executable not found '$(ILRepackExecutable)'" />-->
+    <Exec Command="&quot;$(DOTNET_HOST_PATH)&quot; $(ILRepackExecutable) /parallel /internalize /lib:&quot;$(LibDirectory)&quot; /out:&quot;$(ILRepackOutputAssembly)&quot; @(ILRepackInputAssemblies -> '&quot;%(FullPath)&quot;', ' ')"/>
   </Target>
 </Project>
